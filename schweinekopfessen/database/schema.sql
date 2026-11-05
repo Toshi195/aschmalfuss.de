@@ -1,0 +1,45 @@
+CREATE TABLE residents (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ first_name VARCHAR(100) NOT NULL, last_name VARCHAR(100) NOT NULL,
+ normalized_name VARCHAR(220) COLLATE utf8mb4_bin NOT NULL,
+ active BOOLEAN NOT NULL DEFAULT 1,
+ invitation_hash CHAR(64) COLLATE ascii_bin NULL UNIQUE,
+ invitation_revoked BOOLEAN NOT NULL DEFAULT 0,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ INDEX resident_name (normalized_name, active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE registrations (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ resident_id BIGINT UNSIGNED NOT NULL UNIQUE,
+ wants_schweinekopf BOOLEAN NOT NULL, wants_eisbein BOOLEAN NOT NULL,
+ status VARCHAR(20) NOT NULL DEFAULT 'confirmed',
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY (resident_id) REFERENCES residents(id) ON DELETE CASCADE,
+ CONSTRAINT one_meal CHECK (wants_schweinekopf IN (0,1) AND wants_eisbein IN (0,1) AND wants_schweinekopf + wants_eisbein = 1)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE visitor_statistics (
+ day DATE PRIMARY KEY, views BIGINT UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=InnoDB;
+CREATE TABLE app_settings (
+ id TINYINT PRIMARY KEY,
+ registration_enabled BOOLEAN NOT NULL DEFAULT 0
+) ENGINE=InnoDB;
+INSERT INTO app_settings (id,registration_enabled) VALUES (1,0);
+CREATE TABLE admin_auth_state (
+ actor_reference VARCHAR(80) PRIMARY KEY,
+ last_totp_step BIGINT NOT NULL DEFAULT -1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE online_visitors (
+ token CHAR(64) PRIMARY KEY, seen_at DATETIME NOT NULL, INDEX (seen_at)
+) ENGINE=InnoDB;
+CREATE TABLE rate_limits (
+ token CHAR(64) PRIMARY KEY, attempts INT UNSIGNED NOT NULL, expires_at DATETIME NOT NULL,
+ INDEX (expires_at)
+) ENGINE=InnoDB;
+CREATE TABLE admin_audit_log (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, action VARCHAR(80) NOT NULL,
+ timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, result VARCHAR(30) NOT NULL,
+ actor_reference VARCHAR(80) NOT NULL
+) ENGINE=InnoDB;

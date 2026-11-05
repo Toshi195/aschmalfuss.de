@@ -1,0 +1,10 @@
+Options -Indexes
+DirectoryIndex index.php
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://aschmalfuss.de%{REQUEST_URI} [R=301,L]
+</IfModule>
+<FilesMatch "^\.">
+Require all denied
+</FilesMatch>

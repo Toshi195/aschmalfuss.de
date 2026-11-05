@@ -1,0 +1,12 @@
+/config.php
+/tools/php/
+/tools/php.zip
+/tools/releases.json
+*.log
+/tools/sync-baseline.json
+/tools/mariadb*/
+/tools/mariadb*
+/tools/test-data/
+/tools/test-*.json
+/backups/
+*.backup
