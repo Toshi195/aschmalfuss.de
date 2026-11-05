@@ -8,6 +8,7 @@ $_SERVER['REQUEST_METHOD']='GET'; $_POST=[]; $_GET=[];
 ob_start(); require $root.'/public/index.php'; $html=ob_get_clean();
 $html=preg_replace('~<script\b[^>]*>.*?</script>~s','',$html);
 $html=preg_replace('~<input[^>]*type="hidden"[^>]*>~','',$html);
+$html=str_replace(['/assets/'],['../public/assets/'],$html);
 $html=str_replace('href="/style.css"','href="../public/style.css"',$html);
 $html=str_replace('href="/legal.php','href="rechtliches.html',$html);
 $html=str_replace('href="/"','href="../../index.html"',$html);
